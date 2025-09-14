@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Life-Check AI — Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="topbar"> 
+    <div class="logo">
+      <div class="mark">LC</div>
+      <div>
+        <div class="title">Life-Check AI</div>
+        <div class="small">Smart vitals — one device</div>
+      </div>
+    </div>
+    <div>
+      <button class="secondary" id="profileBtn">Profile</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <aside class="sidebar card">
+        <div class="navitem active" data-tab="dashboard">🏠 Dashboard</div>
+        <div class="navitem" data-tab="measure">🎚 Live Measure</div>
+        <div class="navitem" data-tab="doctors">👨‍⚕️ Doctor</div>
+        <div class="navitem" data-tab="pharmacy">💊 Pharmacy</div>
+        <div class="navitem" data-tab="orders">📦 Orders</div>
+        <div class="navitem" data-tab="profile">⚙️ Settings</div>
+        <hr>
+        <div class="small">Device: Life-Check v1 • Last sync: <span id="lastSync">Never</span></div>
+      </aside>
+
+      <main>
+        <!-- Dashboard -->
+        <section id="dashboard" class="card content active">
+          <div class="top-actions">
+            <div>
+              <div class="title-lg">Hello, Rishi</div>
+              <div class="small">Today's snapshot</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="cta" id="oneTouch">One-Touch Check</button>
+              <button class="secondary" id="syncBtn">Sync</button>
+            </div>
+          </div>
+
+          <div class="vitals">
+            <div class="vcard">
+              <div class="vlabel">Blood Pressure</div>
+              <div class="vval" id="bpVal">-- / -- mmHg</div>
+              <div class="small" id="bpNote">No data</div>
+            </div>
+            <div class="vcard">
+              <div class="vlabel">SpO₂</div>
+              <div class="vval" id="spo2Val">-- %</div>
+              <div class="small" id="spo2Note">No data</div>
+            </div>
+            <div class="vcard">
+              <div class="vlabel">Temperature</div>
+              <div class="vval" id="tempVal">-- °C</div>
+              <div class="small" id="tempNote">No data</div>
+            </div>
+            <div class="vcard">
+              <div class="vlabel">Heart</div>
+              <div class="vval" id="heartVal">Normal</div>
+              <div class="small" id="heartNote">Confidence — --</div>
+            </div>
+          </div>
+
+          <hr>
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+            <div style="flex:1;min-width:240px">
+              <div class="card">
+                <div style="font-weight:700">Recent Readings</div>
+                <div class="history-list" id="historyList" style="margin-top:8px">
+                  <div class="history-item">No readings yet</div>
+                </div>
+              </div>
+            </div>
+            <div style="width:320px">
+              <div class="card">
+                <div style="font-weight:700">Quick Actions</div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                  <button class="btn-small btn-primary" id="consultBtn">Consult Doctor</button>
+                  <button class="btn-small btn-secondary" id="openPharm">Find Medicines</button>
+                  <button class="btn-small" id="exportBtn" style="background:var(--accent);color:white">Export PDF</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Live Measure -->
+        <section id="measure" class="card content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Live Measure</div>
+              <div class="small">Select sensor to measure</div>
+            </div>
+            <div>
+              <button class="secondary" id="backToDash">Back</button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn-small btn-primary" data-sensor="heart">Stethoscope</button>
+            <button class="btn-small btn-primary" data-sensor="bp">Blood Pressure</button>
+            <button class="btn-small btn-primary" data-sensor="spo2">SpO₂</button>
+            <button class="btn-small btn-primary" data-sensor="temp">Temperature</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div class="card">
+              <div style="font-weight:700;margin-bottom:8px">Live Output</div>
+              <div class="wave" id="liveWave">Press a sensor to begin</div>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+                <div class="vcard" style="min-width:140px">
+                  <div class="vlabel">Value</div>
+                  <div class="vval" id="liveValue">--</div>
+                </div>
+                <div class="vcard" style="min-width:140px">
+                  <div class="vlabel">Status</div>
+                  <div class="vval" id="liveStatus">Idle</div>
+                </div>
+                <div class="vcard" style="min-width:140px">
+                  <div class="vlabel">Confidence</div>
+                  <div class="vval" id="liveConf">--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Doctors -->
+        <section id="doctors" class="card content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Doctors</div>
+              <div class="small">Connect with a specialist</div>
+            </div>
+            <div>
+              <button class="secondary" id="backDash2">Back</button>
+            </div>
+          </div>
+
+          <div class="doctor-list">
+            <div class="doctor">
+              <img src="https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=200&auto=format&fit=crop" alt="doc">
+              <div style="flex:1">
+                <div style="font-weight:700">Dr. Aditi Sharma</div>
+                <div class="small">Cardiologist • 4.8 ★</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn-small btn-primary" onclick="startConsult('Dr. Aditi Sharma')">Video Consult</button>
+                <button class="btn-small" onclick="viewProfile('Dr. Aditi Sharma')">Profile</button>
+              </div>
+            </div>
+
+            <div class="doctor">
+              <img src="https://images.unsplash.com/photo-1542736667-069246bdbc6d?q=80&w=200&auto=format&fit=crop" alt="doc">
+              <div style="flex:1">
+                <div style="font-weight:700">Dr. Rohit Patel</div>
+                <div class="small">General Physician • 4.7 ★</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="btn-small btn-primary" onclick="startConsult('Dr. Rohit Patel')">Video Consult</button>
+                <button class="btn-small" onclick="viewProfile('Dr. Rohit Patel')">Profile</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pharmacy -->
+        <section id="pharmacy" class="card content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Pharmacy & Prescriptions</div>
+              <div class="small">Find medicines & order</div>
+            </div>
+            <div>
+              <button class="secondary" id="backDash3">Back</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="pharmacy">
+              <div>
+                <div style="font-weight:700">HealthPlus Pharmacy</div>
+                <div class="small">0.8 km • Open now</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="small" style="color:green">In Stock</div>
+                <button class="btn-small btn-primary" onclick="orderFrom('HealthPlus Pharmacy')">Order</button>
+              </div>
+            </div>
+
+            <div class="pharmacy">
+              <div>
+                <div style="font-weight:700">CityCare Medical</div>
+                <div class="small">1.3 km • Open</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="small" style="color:orange">Low</div>
+                <button class="btn-small btn-secondary" onclick="orderFrom('CityCare Medical')">Reserve</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Orders -->
+        <section id="orders" class="card content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Orders</div>
+              <div class="small">Track medicine orders</div>
+            </div>
+            <div>
+              <button class="secondary" id="backDash4">Back</button>
+            </div>
+          </div>
+
+          <div class="timeline" id="ordersList">
+            <div class="timeline-item">
+              <div class="dot"></div>
+              <div>
+                <div style="font-weight:700">No orders yet</div>
+                <div class="small">Place an order from Pharmacy tab</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Profile -->
+        <section id="profile" class="card content" style="display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div>
+              <div style="font-weight:700">Profile & Settings</div>
+              <div class="small">Manage account, devices & privacy</div>
+            </div>
+            <div>
+              <button class="secondary" id="backDash5">Back</button>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="card">
+              <div style="font-weight:700">User</div>
+              <div class="small">Rishi Gour • rishi@example.com • +91 9XXXXXXXX</div>
+            </div>
+            <div class="card">
+              <div style="font-weight:700">Devices</div>
+              <div class="small">Life-Check AI • SN: LC-001 • <span id="deviceStatus">Not paired</span></div>
+              <div style="margin-top:8px"><button class="btn-small btn-primary" onclick="pairDevice()">Pair Device</button></div>
+            </div>
+            <div class="card">
+              <div style="font-weight:700">Privacy</div>
+              <div class="small">Data sharing consent: <strong id="consentText">Not granted</strong></div>
+              <div style="margin-top:8px"><button class="btn-small btn-secondary" onclick="toggleConsent()">Toggle Consent</button></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav" style="display:none" id="mobileNav">
+    <button class="mobile-btn active" data-tab="dashboard" onclick="switchTab('dashboard',true)">Home</button>
+    <button class="mobile-btn" data-tab="measure" onclick="switchTab('measure',true)">Measure</button>
+    <button class="mobile-btn" data-tab="doctors" onclick="switchTab('doctors',true)">Doctors</button>
+    <button class="mobile-btn" data-tab="pharmacy" onclick="switchTab('pharmacy',true)">Pharmacy</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-back" id="modalBack">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700" id="modalTitle">Measuring</div>
+        <div><button class="secondary" onclick="closeModal()">Close</button></div>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div style="flex:1">
+          <div class="small">Live Waveform</div>
+          <div class="wave" id="modalWave">—</div>
+        </div>
+        <div style="width:200px">
+          <div class="small">Real-time Values</div>
+          <div style="margin-top:8px">
+            <div class="vcard" style="margin-bottom:8px">
+              <div class="vlabel">Value</div>
+              <div class="vval" id="modalValue">--</div>
+            </div>
+            <div class="vcard">
+              <div class="vlabel">Confidence</div>
+              <div class="vval" id="modalConf">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="secondary" id="cancelMeasureBtn">Cancel</button>
+        <button class="cta" id="saveMeasureBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" style="position:fixed;right:16px;bottom:16px;z-index:9999"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
